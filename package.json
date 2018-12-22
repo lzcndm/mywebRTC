@@ -1,0 +1,25 @@
+{
+  "name": "mywebRTC",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "dependencies": {
+    "lodash": "^4.17.11",
+    "uglify-js": "^3.4.9",
+    "webpack": "^4.28.1",
+    "webpack-cli": "^3.1.2",
+    "webrtc-adapter": "^7.1.1",
+    "wired-elements": "^0.8.2"
+  },
+  "devDependencies": {
+    "uglifyjs-webpack-plugin": "^2.0.1",
+    "webpack-dev-server": "^3.1.11"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "webpack-dev-server --open"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
