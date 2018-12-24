@@ -3,12 +3,12 @@ import 'wired-button';
 import 'wired-input';
 import 'wired-listbox';
 import 'wired-item';
+import 'wired-card';
+import 'wired-textarea';
 
 let dataChannelSendBtn = document.querySelector('#data-channel-send');
 let callBtn = document.querySelector('#call-btn');
-let listbox = document.querySelector('#login-users');
-callBtn.disabled = true;
-dataChannelSendBtn.disabled = true;
+let loginUsersBox = document.querySelector('#login-users');
 const wsServer = 'ws://192.168.11.136:9501';
 let webSocket = new WebSocket(wsServer);
 
@@ -22,7 +22,7 @@ webSocket.onopen = () => {
         action: "getOnlineUsers",
         content: "all"
     }));
-    dataChannelSendBtn.disabled = true;
+    dataChannelSendBtn.disabled = false;
 };
 
 webSocket.onclose = () => {

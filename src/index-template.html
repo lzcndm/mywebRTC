@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <style>
+        html{
+            width: 100%;
+            height: 100%;
+        }
+        .box{
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            align-items: center;
+        }
+        .container{
+            width: 30rem;
+            height: 20rem;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        #login-users{
+            height: 100%;
+            width: 20%;
+        }
+        .btn{
+            height: 1rem;
+        }
+        #right-container{
+            width: 75%;
+            height: 100%;
+            display: flex;
+            flex-wrap: wrap;
+        }
+        #message-container{
+            width: 100%;
+            height: 80%;
+        }
+        #input-message{
+            width: 70%;
+            height: 18%;
+        }
+        #data-channel-send{
+            width: 24%;
+            height: 18%;
+        }
+        .btn{
+            padding: 5px;
+        }
+    </style>
+</head>
+<body class="box">
+    <div class="container">
+        <wired-listbox id="login-users"></wired-listbox>
+        <div id="right-container">
+            <wired-card id="message-container"></wired-card>
+            <wired-textarea id="input-message" placeholder="enter something" disabled></wired-textarea>
+            <wired-button class="btn" id="data-channel-send" disabled>send</wired-button>
+        </div>
+    </div>
+</body>
+</html>
