@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <style>
-        html{
+        html {
             width: 100%;
             height: 100%;
         }
-        .box{
+
+        .box {
             margin: 0;
             display: flex;
             justify-content: center;
@@ -17,42 +19,57 @@
             height: 100%;
             align-items: center;
         }
-        .container{
+
+        .container {
             width: 30rem;
             height: 20rem;
             display: flex;
             flex-wrap: wrap;
         }
-        #login-users{
+
+        #login-users {
             height: 100%;
             width: 20%;
+            overflow-x: hidden;
+            overflow-y: auto;
         }
-        .btn{
+
+        .btn {
             height: 1rem;
         }
-        #right-container{
+
+        #right-container {
             width: 75%;
             height: 100%;
             display: flex;
             flex-wrap: wrap;
         }
-        #message-container{
+
+        #message-container {
             width: 100%;
             height: 80%;
         }
-        #input-message{
+
+        #input-message {
             width: 70%;
             height: 18%;
         }
-        #data-channel-send{
+
+        #data-channel-send {
             width: 24%;
             height: 18%;
         }
-        .btn{
+
+        .btn {
             padding: 5px;
         }
+
+        /* wired-item{
+            overflow: hidden;
+        } */
     </style>
 </head>
+
 <body class="box">
     <div class="container">
         <wired-listbox id="login-users"></wired-listbox>
@@ -63,4 +80,5 @@
         </div>
     </div>
 </body>
+
 </html>
