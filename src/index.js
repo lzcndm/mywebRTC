@@ -32,27 +32,6 @@ localConnection.onicecandidate = (event) => {
     }
 }
 
-<<<<<<< HEAD
-=======
-// dataChannel.onopen = () => {
-//     console.log('dataChannel open');
-//     console.log(messageContainer);
-//     messageContainer.disabled = false;
-//     dataChannelSendBtn.disabled = false;
-// }
-
-// dataChannel.onmessage = (data) => {
-//     console.log('dataChannel receive data');
-//     console.log(data);
-// }
-
-// dataChannel.onclose = () => {
-//     console.log('dataChannel close');
-//     messageContainer.disabled = true;
-//     dataChannelSendBtn.disabled = true;
-// }
-
->>>>>>> cb63a83f7f9cf57fce103342bccfb6743692d723
 dataChannelSendBtn.onclick = () => {
     let message = messageContainer.value;
     console.log(message);
