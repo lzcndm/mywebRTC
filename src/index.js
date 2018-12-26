@@ -32,24 +32,6 @@ localConnection.onicecandidate = (event) => {
     }
 }
 
-dataChannel.onopen = () => {
-    console.log('dataChannel open');
-    console.log(messageContainer);
-    messageContainer.disabled = false;
-    dataChannelSendBtn.disabled = false;
-}
-
-dataChannel.onmessage = (data) => {
-    console.log('dataChannel receive data');
-    console.log(data);
-}
-
-dataChannel.onclose = () => {
-    console.log('dataChannel close');
-    messageContainer.disabled = true;
-    dataChannelSendBtn.disabled = true;
-}
-
 dataChannelSendBtn.onclick = () => {
     let message = messageContainer.value;
     console.log(message);
@@ -59,12 +41,19 @@ dataChannelSendBtn.onclick = () => {
 localConnection.ondatachannel = (event) => {
     let channel = event.channel;
     channel.onopen = () => {
-        console.log('channel open')
+        console.log('channel open');
+        messageContainer.disabled = false;
+        dataChannelSendBtn.disabled = false;
     }
 
     channel.onmessage = (data) => {
         console.log('channel receive data')
         console.log(data);
+    }
+
+    channel.onclose = () => {
+        messageContainer.disabled = true;
+        dataChannelSendBtn.disabled = true;
     }
 }
 
@@ -87,8 +76,13 @@ webSocket.onclose = () => {
 webSocket.onmessage = (data) => {
     console.log('receive message');
     console.log(data);
-    let message = JSON.parse(data.data);
-
+    let message
+    try {
+        message = JSON.parse(data.data);
+    } catch (error) {
+        console.warn(error);
+        return ;
+    }
     if (message.action) {
         switch (message.action) {
             case 'exchangeDes':
@@ -154,7 +148,7 @@ function appendUser(username) {
     loginUser.value = username;
     loginUser.onclick = () => {
         localConnection.createOffer().then((des) => {
-            offer =true;
+            offer = true;
             remoteUser = username;
             localConnection.setLocalDescription(des);
             webSocket.send(JSON.stringify({
