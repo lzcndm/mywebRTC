@@ -9,9 +9,9 @@ import 'wired-textarea';
 let dataChannelSendBtn = document.querySelector('#data-channel-send');
 let loginUsersBox = document.querySelector('#login-users');
 let messageContainer = document.querySelector('#input-message');
-const wsServer = 'ws://192.168.11.136:9501';
+let wsServer = 'ws://192.168.11.136:9501';
 let webSocket = new WebSocket(wsServer);
-const name = Math.random().toString(36).substr(2);
+let name = Math.random().toString(36).substr(2);
 
 let localConnection = new RTCPeerConnection(null, null);
 let dataChannel = localConnection.createDataChannel('dataChannel', null);
@@ -32,6 +32,27 @@ localConnection.onicecandidate = (event) => {
     }
 }
 
+<<<<<<< HEAD
+=======
+// dataChannel.onopen = () => {
+//     console.log('dataChannel open');
+//     console.log(messageContainer);
+//     messageContainer.disabled = false;
+//     dataChannelSendBtn.disabled = false;
+// }
+
+// dataChannel.onmessage = (data) => {
+//     console.log('dataChannel receive data');
+//     console.log(data);
+// }
+
+// dataChannel.onclose = () => {
+//     console.log('dataChannel close');
+//     messageContainer.disabled = true;
+//     dataChannelSendBtn.disabled = true;
+// }
+
+>>>>>>> cb63a83f7f9cf57fce103342bccfb6743692d723
 dataChannelSendBtn.onclick = () => {
     let message = messageContainer.value;
     console.log(message);
@@ -104,7 +125,7 @@ webSocket.onmessage = (data) => {
                         }))
                     })
                 }
-                
+
                 break;
             case 'loginNotice':
                 appendUser(message.content);
