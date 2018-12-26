@@ -9,9 +9,9 @@ import 'wired-textarea';
 let dataChannelSendBtn = document.querySelector('#data-channel-send');
 let loginUsersBox = document.querySelector('#login-users');
 let messageContainer = document.querySelector('#input-message');
-const wsServer = 'ws://192.168.11.136:9501';
+let wsServer = 'ws://192.168.11.136:9501';
 let webSocket = new WebSocket(wsServer);
-const name = Math.random().toString(36).substr(2);
+let name = Math.random().toString(36).substr(2);
 
 let localConnection = new RTCPeerConnection(null, null);
 let dataChannel = localConnection.createDataChannel('dataChannel', null);
@@ -32,23 +32,23 @@ localConnection.onicecandidate = (event) => {
     }
 }
 
-dataChannel.onopen = () => {
-    console.log('dataChannel open');
-    console.log(messageContainer);
-    messageContainer.disabled = false;
-    dataChannelSendBtn.disabled = false;
-}
+// dataChannel.onopen = () => {
+//     console.log('dataChannel open');
+//     console.log(messageContainer);
+//     messageContainer.disabled = false;
+//     dataChannelSendBtn.disabled = false;
+// }
 
-dataChannel.onmessage = (data) => {
-    console.log('dataChannel receive data');
-    console.log(data);
-}
+// dataChannel.onmessage = (data) => {
+//     console.log('dataChannel receive data');
+//     console.log(data);
+// }
 
-dataChannel.onclose = () => {
-    console.log('dataChannel close');
-    messageContainer.disabled = true;
-    dataChannelSendBtn.disabled = true;
-}
+// dataChannel.onclose = () => {
+//     console.log('dataChannel close');
+//     messageContainer.disabled = true;
+//     dataChannelSendBtn.disabled = true;
+// }
 
 dataChannelSendBtn.onclick = () => {
     let message = messageContainer.value;
@@ -59,12 +59,19 @@ dataChannelSendBtn.onclick = () => {
 localConnection.ondatachannel = (event) => {
     let channel = event.channel;
     channel.onopen = () => {
-        console.log('channel open')
+        console.log('channel open');
+        messageContainer.disabled = false;
+        dataChannelSendBtn.disabled = false;
     }
 
     channel.onmessage = (data) => {
         console.log('channel receive data')
         console.log(data);
+    }
+
+    channel.onclose = () => {
+        messageContainer.disabled = true;
+        dataChannelSendBtn.disabled = true;
     }
 }
 
@@ -110,7 +117,7 @@ webSocket.onmessage = (data) => {
                         }))
                     })
                 }
-                
+
                 break;
             case 'loginNotice':
                 appendUser(message.content);
@@ -154,7 +161,7 @@ function appendUser(username) {
     loginUser.value = username;
     loginUser.onclick = () => {
         localConnection.createOffer().then((des) => {
-            offer =true;
+            offer = true;
             remoteUser = username;
             localConnection.setLocalDescription(des);
             webSocket.send(JSON.stringify({
