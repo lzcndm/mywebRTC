@@ -107,7 +107,7 @@ webSocket.onmessage = (data) => {
 
                 break;
             case 'loginNotice':
-                appendUser(message.content);
+                appendUser(message.content.name);
                 break;
             case 'userOffline':
                 let users = loginUsersBox.children;
