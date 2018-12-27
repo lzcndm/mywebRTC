@@ -13,22 +13,84 @@ let wsServer = 'ws://192.168.11.136:9501';
 let webSocket = new WebSocket(wsServer);
 let name = Math.random().toString(36).substr(2);
 
-let localConnection = new RTCPeerConnection(null, null);
-let dataChannel = localConnection.createDataChannel('dataChannel', null);
+let localConnection;
+let dataChannel;
 let remoteUser;
 let offer = false;
+createLocalConnection();
 
-localConnection.onicecandidate = (event) => {
-    console.log('on ice candidate event');
-    if (event.candidate) {
-        webSocket.send(JSON.stringify({
-            action: 'exchangeCandidate',
-            content: {
-                candidate: event.candidate,
-                target: remoteUser,
-                from: name
-            },
-        }))
+function createLocalConnection () {
+    localConnection = new RTCPeerConnection(null, null);
+    dataChannel = localConnection.createDataChannel('dataChannel', null);
+
+    localConnection.onicecandidate = (event) => {
+        console.log('on ice candidate event');
+        if (event.candidate) {
+            webSocket.send(JSON.stringify({
+                action: 'exchangeCandidate',
+                content: {
+                    candidate: event.candidate,
+                    target: remoteUser,
+                    from: name
+                },
+            }))
+        }
+    }
+
+    localConnection.onconnectionstatechange = () => {
+        console.info(localConnection.connectionState);
+        switch(localConnection.connectionState) {
+            case 'connected':
+                console.log('rtc connected');
+                break;
+            case 'connecting':
+                console.log('rtc connecting');
+                break;
+            case 'disconnected':
+                console.log('rtc disconnected');
+                localConnection.close();
+                localConnection = null,
+                dataChannel.close();
+                dataChannel = null;
+                break;
+            case 'failed':
+                console.log('rtc connect failed');
+                break;
+            case 'new':
+                console.log('rtc new');
+                break;
+            case 'closed':
+                console.log('rtc connection');
+                break;
+            case 'checking':
+                console.log('rtc checking');
+                break;
+        }
+    }
+
+    localConnection.ondatachannel = (event) => {
+        let channel = event.channel;
+        channel.onopen = () => {
+            console.log('channel open');
+            messageContainer.disabled = false;
+            dataChannelSendBtn.disabled = false;
+        }
+    
+        channel.onmessage = (data) => {
+            console.log('channel receive data')
+            console.log(data);
+        }
+    
+        channel.onclose = () => {
+            console.log('channel close')
+            messageContainer.disabled = true;
+            dataChannelSendBtn.disabled = true;
+        }
+    
+        channel.onerror = (error) => {
+            console.log('channel error');
+            console.log(error.toString());
+        }
     }
 }
 
@@ -36,25 +98,6 @@ dataChannelSendBtn.onclick = () => {
     let message = messageContainer.value;
     console.log(message);
     dataChannel.send(message);
-}
-
-localConnection.ondatachannel = (event) => {
-    let channel = event.channel;
-    channel.onopen = () => {
-        console.log('channel open');
-        messageContainer.disabled = false;
-        dataChannelSendBtn.disabled = false;
-    }
-
-    channel.onmessage = (data) => {
-        console.log('channel receive data')
-        console.log(data);
-    }
-
-    channel.onclose = () => {
-        messageContainer.disabled = true;
-        dataChannelSendBtn.disabled = true;
-    }
 }
 
 webSocket.onopen = () => {
@@ -87,6 +130,9 @@ webSocket.onmessage = (data) => {
         switch (message.action) {
             case 'exchangeDes':
                 console.log('set remote description');
+                if (localConnection === null) {
+                    createLocalConnection();
+                }
                 localConnection.setRemoteDescription(message.des);
                 remoteUser = message.from;
 
@@ -147,6 +193,9 @@ function appendUser(username) {
     loginUser.text = username;
     loginUser.value = username;
     loginUser.onclick = () => {
+        if (localConnection === null) {
+            createLocalConnection();
+        }
         localConnection.createOffer().then((des) => {
             offer = true;
             remoteUser = username;
