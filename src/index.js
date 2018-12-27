@@ -25,6 +25,8 @@ navigator.mediaDevices.getUserMedia({video: true}).then((stream) => {
     video.style.display = 'block';
     video.srcObject = stream;
     localStream = stream;
+}).catch(err => {
+    console.log(err.toString());
 })
 
 createLocalConnection();
@@ -78,6 +80,7 @@ function createLocalConnection () {
     }
 
     localConnection.ontrack = (event) => {
+        console.log(event);
         console.log('ontrack');
         if (!video.srcObject) {
             video.srcObject = event.streams[0];
@@ -212,9 +215,11 @@ function appendUser(username) {
         if (localConnection === null) {
             createLocalConnection();
         }
-        localStream.getTracks().forEach(track => {
-            localConnection.addTrack(track, localStream);
-        })
+        if (localStream) {
+            localStream.getTracks().forEach(track => {
+                localConnection.addTrack(track, localStream);
+            })
+        }
         localConnection.createOffer({offerToReceiveVideo: 1}).then((des) => {
             offer = true;
             remoteUser = username;
