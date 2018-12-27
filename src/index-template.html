@@ -11,6 +11,11 @@
             height: 100%;
         }
 
+        #video{
+            width: 100%;
+            height: 98%;
+        }
+
         .box {
             margin: 0;
             display: flex;
@@ -124,7 +129,9 @@
     <div class="container">
         <wired-listbox id="login-users"></wired-listbox>
         <div id="right-container">
-            <wired-card id="message-container"></wired-card>
+            <wired-card id="message-container">
+                <video id="video" autoplay playsinline></video>
+            </wired-card>
             <wired-textarea id="input-message" placeholder="enter something" disabled></wired-textarea>
             <wired-button class="btn" id="data-channel-send" disabled>send</wired-button>
         </div>

@@ -12,11 +12,21 @@ let messageContainer = document.querySelector('#input-message');
 let wsServer = 'ws://192.168.11.136:9501';
 let webSocket = new WebSocket(wsServer);
 let name = Math.random().toString(36).substr(2);
+let video = document.querySelector('#video');
 
 let localConnection;
 let dataChannel;
 let remoteUser;
 let offer = false;
+let localStream;
+
+navigator.mediaDevices.getUserMedia({video: true}).then((stream) => {
+    console.log('get local camera')
+    video.style.display = 'block';
+    video.srcObject = stream;
+    localStream = stream;
+})
+
 createLocalConnection();
 
 function createLocalConnection () {
@@ -38,7 +48,6 @@ function createLocalConnection () {
     }
 
     localConnection.onconnectionstatechange = () => {
-        console.info(localConnection.connectionState);
         switch(localConnection.connectionState) {
             case 'connected':
                 console.log('rtc connected');
@@ -65,6 +74,13 @@ function createLocalConnection () {
             case 'checking':
                 console.log('rtc checking');
                 break;
+        }
+    }
+
+    localConnection.ontrack = (event) => {
+        console.log('ontrack');
+        if (!video.srcObject) {
+            video.srcObject = event.streams[0];
         }
     }
 
@@ -196,7 +212,10 @@ function appendUser(username) {
         if (localConnection === null) {
             createLocalConnection();
         }
-        localConnection.createOffer().then((des) => {
+        localStream.getTracks().forEach(track => {
+            localConnection.addTrack(track, localStream);
+        })
+        localConnection.createOffer({offerToReceiveVideo: 1}).then((des) => {
             offer = true;
             remoteUser = username;
             localConnection.setLocalDescription(des);
