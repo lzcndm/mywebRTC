@@ -29,7 +29,7 @@ let localStream;
 //     console.log(err.toString());
 // })
 
-function createLocalConnection (remoteUser) {
+function createLocalConnection(remoteUser) {
     let channelLabel = name + "-" + remoteUser;
     let tmpConnection = new RTCPeerConnection(null, null);
     localConnection[remoteUser] = tmpConnection;
@@ -50,7 +50,7 @@ function createLocalConnection (remoteUser) {
     }
 
     tmpConnection.onconnectionstatechange = () => {
-        switch(tmpConnection.connectionState) {
+        switch (tmpConnection.connectionState) {
             case 'connected':
                 console.log('rtc connected');
                 break;
@@ -60,7 +60,7 @@ function createLocalConnection (remoteUser) {
             case 'disconnected':
                 console.log('rtc disconnected');
                 tmpConnection.close();
-                tmpConnection = null,
+                tmpConnection = null;
                 dataChannel.close();
                 dataChannel = null;
                 delete localConnection[remoteUser];
@@ -95,18 +95,18 @@ function createLocalConnection (remoteUser) {
             messageContainer.disabled = false;
             dataChannelSendBtn.disabled = false;
         }
-    
+
         channel.onmessage = (data) => {
-            console.log('channel receive data')
+            console.log(channel.label, ' channel receive data')
             console.log(data);
         }
-    
+
         channel.onclose = () => {
             console.log('channel close')
             messageContainer.disabled = true;
             dataChannelSendBtn.disabled = true;
         }
-    
+
         channel.onerror = (error) => {
             console.log('channel error');
             console.log(error.toString());
@@ -144,7 +144,7 @@ webSocket.onmessage = (data) => {
         message = JSON.parse(data.data);
     } catch (error) {
         console.warn(error);
-        return ;
+        return;
     }
     if (message.action) {
         switch (message.action) {
@@ -168,6 +168,8 @@ webSocket.onmessage = (data) => {
                                 from: name
                             }
                         }))
+                    }).catch(err => {
+                        console.log(err.toString())
                     })
                 }
 
@@ -197,6 +199,8 @@ webSocket.onmessage = (data) => {
                     console.log('addIceCandidate success');
                 }, (err) => {
                     console.log('failed to add ice candidate:' + err.toString())
+                }).catch(err => {
+                    console.log(err.toString());
                 })
                 break;
         }
@@ -233,6 +237,8 @@ function appendUser(username) {
                     from: name
                 }
             }))
+        }).catch(err => {
+            console.log(err.toString())
         })
     }
     loginUsersBox.appendChild(loginUser);
