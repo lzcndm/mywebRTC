@@ -14,28 +14,28 @@ let webSocket = new WebSocket(wsServer);
 let name = Math.random().toString(36).substr(2);
 let video = document.querySelector('#video');
 
-let localConnection;
-let dataChannel;
+let localConnection = [];
+let dataChannel; // todo：修改以适配多个连接
 let remoteUser;
-let offer = false;
+let offer = [];
 let localStream;
 
-navigator.mediaDevices.getUserMedia({video: true}).then((stream) => {
-    console.log('get local camera')
-    video.style.display = 'block';
-    video.srcObject = stream;
-    localStream = stream;
-}).catch(err => {
-    console.log(err.toString());
-})
+// navigator.mediaDevices.getUserMedia({video: true}).then((stream) => {
+//     console.log('get local camera')
+//     video.style.display = 'block';
+//     video.srcObject = stream;
+//     localStream = stream;
+// }).catch(err => {
+//     console.log(err.toString());
+// })
 
-createLocalConnection();
+function createLocalConnection (remoteUser) {
+    let channelLabel = name + "-" + remoteUser;
+    let tmpConnection = new RTCPeerConnection(null, null);
+    localConnection[remoteUser] = tmpConnection;
+    dataChannel = tmpConnection.createDataChannel(channelLabel, null);
 
-function createLocalConnection () {
-    localConnection = new RTCPeerConnection(null, null);
-    dataChannel = localConnection.createDataChannel('dataChannel', null);
-
-    localConnection.onicecandidate = (event) => {
+    tmpConnection.onicecandidate = (event) => {
         console.log('on ice candidate event');
         if (event.candidate) {
             webSocket.send(JSON.stringify({
@@ -49,8 +49,8 @@ function createLocalConnection () {
         }
     }
 
-    localConnection.onconnectionstatechange = () => {
-        switch(localConnection.connectionState) {
+    tmpConnection.onconnectionstatechange = () => {
+        switch(tmpConnection.connectionState) {
             case 'connected':
                 console.log('rtc connected');
                 break;
@@ -59,10 +59,11 @@ function createLocalConnection () {
                 break;
             case 'disconnected':
                 console.log('rtc disconnected');
-                localConnection.close();
-                localConnection = null,
+                tmpConnection.close();
+                tmpConnection = null,
                 dataChannel.close();
                 dataChannel = null;
+                delete localConnection[remoteUser];
                 break;
             case 'failed':
                 console.log('rtc connect failed');
@@ -79,7 +80,7 @@ function createLocalConnection () {
         }
     }
 
-    localConnection.ontrack = (event) => {
+    tmpConnection.ontrack = (event) => {
         console.log(event);
         console.log('ontrack');
         if (!video.srcObject) {
@@ -87,7 +88,7 @@ function createLocalConnection () {
         }
     }
 
-    localConnection.ondatachannel = (event) => {
+    tmpConnection.ondatachannel = (event) => {
         let channel = event.channel;
         channel.onopen = () => {
             console.log('channel open');
@@ -149,16 +150,16 @@ webSocket.onmessage = (data) => {
         switch (message.action) {
             case 'exchangeDes':
                 console.log('set remote description');
-                if (localConnection === null) {
-                    createLocalConnection();
+                if (localConnection[message.from] === null || localConnection[message.from] === undefined) {
+                    createLocalConnection(message.from);
                 }
-                localConnection.setRemoteDescription(message.des);
+                localConnection[message.from].setRemoteDescription(message.des);
                 remoteUser = message.from;
 
-                if (!offer) {
-                    localConnection.createAnswer().then((des) => {
+                if (!offer[message.from]) {
+                    localConnection[message.from].createAnswer().then((des) => {
                         console.log('answer set local description');
-                        localConnection.setLocalDescription(des);
+                        localConnection[message.from].setLocalDescription(des);
                         webSocket.send(JSON.stringify({
                             action: 'exchangeDes',
                             content: {
@@ -190,7 +191,7 @@ webSocket.onmessage = (data) => {
                 break;
             case 'exchangeCandidate':
                 console.log('exchange candidate');
-                localConnection.addIceCandidate(
+                localConnection[message.from].addIceCandidate(
                     message.candidate
                 ).then(() => {
                     console.log('addIceCandidate success');
@@ -212,18 +213,18 @@ function appendUser(username) {
     loginUser.text = username;
     loginUser.value = username;
     loginUser.onclick = () => {
-        if (localConnection === null) {
-            createLocalConnection();
+        if (localConnection[username] === null || localConnection[username] === undefined) {
+            createLocalConnection(username);
         }
         if (localStream) {
             localStream.getTracks().forEach(track => {
-                localConnection.addTrack(track, localStream);
+                localConnection[username].addTrack(track, localStream);
             })
         }
-        localConnection.createOffer({offerToReceiveVideo: 1}).then((des) => {
-            offer = true;
+        localConnection[username].createOffer({offerToReceiveVideo: 1}).then((des) => {
+            offer[username] = true;
             remoteUser = username;
-            localConnection.setLocalDescription(des);
+            localConnection[username].setLocalDescription(des);
             webSocket.send(JSON.stringify({
                 action: 'exchangeDes',
                 content: {
