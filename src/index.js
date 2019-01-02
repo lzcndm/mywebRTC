@@ -20,7 +20,7 @@ let remoteUser;
 let offer = [];
 let localStream;
 
-// navigator.mediaDevices.getUserMedia({video: true}).then((stream)jsj => {
+// navigator.mediaDevices.getUserMedia({video: true}).then((stream) => {
 //     console.log('get local camera')
 //     video.style.display = 'block';
 //     video.srcObject = stream;
