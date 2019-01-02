@@ -20,7 +20,7 @@ let remoteUser;
 let offer = [];
 let localStream;
 
-// navigator.mediaDevices.getUserMedia({video: true}).then((stream) => {
+// navigator.mediaDevices.getUserMedia({video: true}).then((stream)jsj => {
 //     console.log('get local camera')
 //     video.style.display = 'block';
 //     video.srcObject = stream;
@@ -150,7 +150,7 @@ webSocket.onmessage = (data) => {
         switch (message.action) {
             case 'exchangeDes':
                 console.log('set remote description');
-                if (localConnection[message.from] === null || localConnection[message.from] === undefined) {
+                if (!localConnection[message.from]) {
                     createLocalConnection(message.from);
                 }
                 localConnection[message.from].setRemoteDescription(message.des);
@@ -217,7 +217,7 @@ function appendUser(username) {
     loginUser.text = username;
     loginUser.value = username;
     loginUser.onclick = () => {
-        if (localConnection[username] === null || localConnection[username] === undefined) {
+        if (!localConnection[username]) {
             createLocalConnection(username);
         }
         if (localStream) {
