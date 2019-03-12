@@ -9,5 +9,5 @@ webRTC
 npm install
 
 # develop
-npm run dev
+npm run serve
 ```
